@@ -1,7 +1,6 @@
 from config.database import db
 from utils.password_utils import hash_password
 
-
 class User(db.Model):
     __tablename__ = 'users'
 

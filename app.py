@@ -10,7 +10,7 @@ def create_app():
     init_db(app)
 
     # Register Blueprints
-    app.register_blueprint(user_bp, url_prefix='/users')
+    app.register_blueprint(user_bp, url_prefix='/api/users')
 
     return app
 

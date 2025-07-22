@@ -1,5 +1,6 @@
 from models.user_model import User
 from repositories.user_repository import UserRepository
+import re
 
 
 class UserService:
@@ -10,22 +11,28 @@ class UserService:
         """
         Create a new user
         """
-        # Check if user already exists
+        username_pattern = r"^[0-9A-Za-z]{6,16}$"
+        email_pattern = r"^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$"
+        password_pattern = r"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,32}$"
+
+        if re.match(username_pattern, username):
+            return None, "Invalid username format"
+
+        if re.match(password_pattern, password):
+            return None, ("Password must be 8-32 characters long and include uppercase, lowercase, digit, "
+                          "and special character")
+
+        if email and not re.match(email_pattern, email):
+            return None, "Invalid email format"
+
         if self.user_repository.find_by_username(username):
             return None, "Username already exists"
-        
-        # Check if email exists and is unique
-        if email and self.user_repository.find_by_email(email):
+
+        if self.user_repository.find_by_email(email):
             return None, "Email already exists"
-        
-        # Create new user
-        new_user = User(
-            username=username,
-            password=password,
-            email=email
-        )
-        
-        # Save to database using repository
+
+        new_user = User(username=username, password=password, email=email)
+
         return self.user_repository.save(new_user)
     
     def get_user_by_id(self, user_id):
@@ -33,7 +40,13 @@ class UserService:
         Get a user by ID
         """
         return self.user_repository.find_by_id(user_id)
-    
+
+    def get_user_by_email(self, email):
+        """
+        Get a user by email
+        """
+        return self.user_repository.find_by_email(email)
+
     def get_user_by_username(self, username):
         """
         Get a user by username
@@ -54,4 +67,4 @@ class UserService:
         if not user:
             return False, "User not found"
         
-        return self.user_repository.delete(user) 
+        return self.user_repository.delete(user)

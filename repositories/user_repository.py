@@ -1,5 +1,6 @@
 from config.database import db
 from models.user_model import User
+from sqlalchemy import select
 
 
 class UserRepository:
@@ -15,22 +16,25 @@ class UserRepository:
         except Exception as e:
             self.db_session.rollback()
             return None, str(e)
-    
+
     def find_by_id(self, user_id):
         """Find a user by ID"""
-        return User.query.get(user_id)
-    
+        return self.db_session.get(User, user_id)
+
     def find_by_username(self, username):
         """Find a user by username"""
-        return User.query.filter_by(username=username).first()
+        stmt = db.select(User).where(User.username == username)
+        return self.db_session.scalars(stmt).first()
     
     def find_by_email(self, email):
         """Find a user by email"""
-        return User.query.filter_by(email=email).first()
+        stmt = db.select(User).where(User.email == email)
+        return self.db_session.scalars(stmt).first()
     
     def find_all(self):
         """Find all users"""
-        return User.query.all()
+        stmt = db.select(User)
+        return self.db_session.scalars(stmt).all()
     
     def delete(self, user):
         """Delete a user"""
@@ -40,4 +44,4 @@ class UserRepository:
             return True, None
         except Exception as e:
             self.db_session.rollback()
-            return False, str(e) 
+            return False, str(e)
