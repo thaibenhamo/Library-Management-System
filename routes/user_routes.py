@@ -4,17 +4,13 @@ from services.user_service import UserService
 user_bp = Blueprint('user_bp', __name__)
 user_service = UserService()
 
-
 @user_bp.route('', methods=['POST'])
 def add_user():
     data = request.get_json()
-
     if not data:
         return jsonify({'error': 'No JSON data provided'}), 400
-
     if not data.get('username'):
         return jsonify({'error': 'Username is required'}), 400
-
     if not data.get('password'):
         return jsonify({'error': 'Password is required'}), 400
 
@@ -23,55 +19,44 @@ def add_user():
         password=data['password'],
         email=data.get('email')
     )
-    
+    if error:
+        return jsonify({'error': error}), 400
+
     return jsonify({
         'message': 'User created successfully',
-        'user': user.json()
+        'user': user.to_dict()
     }), 201
-
 
 @user_bp.route('', methods=['GET'])
 def get_all_users():
     users = user_service.get_all_users()
-    return jsonify([user.json() for user in users]), 200
-
+    return jsonify([user.to_dict() for user in users]), 200
 
 @user_bp.route('/<int:user_id>', methods=['GET'])
 def get_user(user_id):
     user = user_service.get_user_by_id(user_id)
-    
     if not user:
         return jsonify({'error': 'User not found'}), 404
-    
-    return jsonify(user.json()), 200
-
+    return jsonify(user.to_dict()), 200
 
 @user_bp.route('/username/<string:username>', methods=['GET'])
 def get_user_by_username(username):
     user = user_service.get_user_by_username(username)
-    
     if not user:
         return jsonify({'error': 'User not found by username'}), 404
-    
-    return jsonify(user.json()), 200
-
+    return jsonify(user.to_dict()), 200
 
 @user_bp.route('/email/<string:email>', methods=['GET'])
 def get_user_by_email(email):
-    print(f"Requested email: {email}")
     user = user_service.get_user_by_email(email)
-
     if not user:
         return jsonify({'error': 'User not found'}), 404
-
-    return jsonify(user.json()), 200
-
+    return jsonify(user.to_dict()), 200
 
 @user_bp.route('/<int:user_id>', methods=['DELETE'])
 def delete_user(user_id):
     success, message = user_service.delete_user(user_id)
-    
     if not success:
         return jsonify({'message': message}), 404
-    
-    return jsonify({'message': 'User deleted successfully'}), 204
+    # 204 must not include a body
+    return ('', 204)
