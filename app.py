@@ -1,20 +1,25 @@
-from flask import Flask
+from flask import Flask, jsonify
 from config.database import init_db
-from routes.user_routes import user_bp
-
+from extensions import jwt, limiter, cache
+from routes.health_routes import health_bp
 
 def create_app():
     app = Flask(__name__)
-    
-    # Initialize database
+
+    # temporary secret; we’ll move this to env later
+    app.config["JWT_SECRET_KEY"] = "change-me"
+
     init_db(app)
+    jwt.init_app(app)
+    limiter.init_app(app)
+    cache.init_app(app)
 
-    # Register Blueprints
-    app.register_blueprint(user_bp, url_prefix='/api/users')
+    @app.errorhandler(Exception)
+    def handle_error(err):
+        code = getattr(err, "code", 500)
+        return jsonify({"error": type(err).__name__, "message": str(err)}), code
 
+    app.register_blueprint(health_bp, url_prefix="/api")
     return app
 
-
-if __name__ == '__main__':
-    app = create_app()
-    app.run(debug=True)
+app = create_app()

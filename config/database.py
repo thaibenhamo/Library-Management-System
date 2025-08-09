@@ -1,15 +1,12 @@
-from flask_sqlalchemy import SQLAlchemy
-from flask_bcrypt import Bcrypt
-from os import environ
-
+import os
+from extensions import db, bcrypt
 # Initialize extensions
-db = SQLAlchemy()
-bcrypt = Bcrypt()
+
 
 
 def init_db(app):
     """Initialize database with app context"""
-    app.config['SQLALCHEMY_DATABASE_URI'] = environ.get('DB_URL', 'sqlite:///app.db')
+    app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DB_URL', 'sqlite:///app.db')
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     
     # Initialize extensions with app
