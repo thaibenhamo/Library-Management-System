@@ -1,18 +1,21 @@
-import os
+from os import environ, makedirs
+from os.path import join
 from extensions import db, bcrypt
-# Initialize extensions
-
+# Singletons
 
 
 def init_db(app):
-    """Initialize database with app context"""
-    app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DB_URL', 'sqlite:///app.db')
+    # Keep DB in instance/app.db so path is deterministic
+    makedirs(app.instance_path, exist_ok=True)
+    db_path = join(app.instance_path, "app.db")
+
+    app.config['SQLALCHEMY_DATABASE_URI'] = environ.get('DB_URL', f'sqlite:///{db_path}')
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-    
-    # Initialize extensions with app
+
     db.init_app(app)
     bcrypt.init_app(app)
-    
-    # Create tables
+
     with app.app_context():
-        db.create_all() 
+        # IMPORTANT: import models BEFORE create_all
+        from models.user_model import User  # add more models here later
+        db.create_all()

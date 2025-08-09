@@ -1,4 +1,4 @@
-from config.database import db
+from extensions import db
 from models.user_model import User
 from sqlalchemy import select
 
@@ -45,3 +45,17 @@ class UserRepository:
         except Exception as e:
             self.db_session.rollback()
             return False, str(e)
+
+def update_partial(self, user: User, **fields):
+    try:
+        for k, v in fields.items():
+            setattr(user, k, v)
+        self.db_session.commit()
+        return user, None
+    except Exception as e:
+        self.db_session.rollback()
+        return None, str(e)
+
+def find_all(self):
+    stmt = db.select(User).order_by(User.id.asc())
+    return self.db_session.scalars(stmt).all()

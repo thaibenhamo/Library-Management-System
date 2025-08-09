@@ -2,12 +2,17 @@ from flask import Flask, jsonify
 from config.database import init_db
 from extensions import jwt, limiter, cache
 from routes.health_routes import health_bp
+from routes.user_routes import user_bp
+
 
 def create_app():
     app = Flask(__name__)
 
     # temporary secret; we’ll move this to env later
-    app.config["JWT_SECRET_KEY"] = "change-me"
+    app.config["JWT_SECRET_KEY"] = "change-me"  # will move to env later
+    app.config["JWT_TOKEN_LOCATION"] = ["headers"]
+    app.config["JWT_HEADER_NAME"] = "Authorization"
+    app.config["JWT_HEADER_TYPE"] = "Bearer"
 
     init_db(app)
     jwt.init_app(app)
@@ -20,6 +25,8 @@ def create_app():
         return jsonify({"error": type(err).__name__, "message": str(err)}), code
 
     app.register_blueprint(health_bp, url_prefix="/api")
+    app.register_blueprint(user_bp, url_prefix="/api/users")
+
     return app
 
 app = create_app()

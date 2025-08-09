@@ -11,29 +11,26 @@ class UserService:
         """
         Create a new user
         """
-        username_pattern = r"^[0-9A-Za-z]{6,16}$"
-        email_pattern = r"^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$"
-        password_pattern = r"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,32}$"
+        username_re = r"^[A-Za-z0-9]{6,16}$"
+        email_re = r"^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$"
+        password_re = r"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,32}$"
 
-        if re.match(username_pattern, username):
-            return None, "Invalid username format"
+        if not re.fullmatch(username_re, username):
+            return None, "Invalid username format (6–16 alphanumerics)."
+        if email and not re.fullmatch(email_re, email):
+            return None, "Invalid email format."
+        if not re.fullmatch(password_re, password):
+            return None, ("Password must be 8–32 chars with at least one lowercase, "
+                          "one uppercase, one digit, and one special char.")
 
-        if re.match(password_pattern, password):
-            return None, ("Password must be 8-32 characters long and include uppercase, lowercase, digit, "
-                          "and special character")
-
-        if email and not re.match(email_pattern, email):
-            return None, "Invalid email format"
-
+        # Uniqueness checks
         if self.user_repository.find_by_username(username):
-            return None, "Username already exists"
+            return None, "Username already taken."
+        if email and self.user_repository.find_by_email(email):
+            return None, "Email already in use."
 
-        if self.user_repository.find_by_email(email):
-            return None, "Email already exists"
-
-        new_user = User(username=username, password=password, email=email)
-
-        return self.user_repository.save(new_user)
+        user = User(username=username, password=password, email=email)
+        return self.user_repository.save(user)
     
     def get_user_by_id(self, user_id):
         """
