@@ -1,6 +1,7 @@
 from extensions import db
 from sqlalchemy import func
 
+
 class User(db.Model):
     __tablename__ = "users"
 
