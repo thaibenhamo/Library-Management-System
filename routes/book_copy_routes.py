@@ -3,7 +3,6 @@ from flask import Blueprint, request, jsonify
 from services.book_copy_service import BookCopyService
 
 book_copy_bp = Blueprint('book_copy', __name__)
-
 book_copy_service = BookCopyService()
 
 
