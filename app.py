@@ -6,6 +6,7 @@ from extensions import jwt, limiter, cache
 from routes.auth_routes import auth_bp
 from routes.health_routes import health_bp
 from routes.user_routes import user_bp
+from routes.author_routes import author_bp
 
 
 def create_app():
@@ -31,6 +32,7 @@ def create_app():
     app.register_blueprint(health_bp, url_prefix="/api")
     app.register_blueprint(user_bp, url_prefix="/api/users")
     app.register_blueprint(auth_bp, url_prefix='/api/auth')
+    app.register_blueprint(author_bp, url_prefix='/api/authors')
 
     return app
 
