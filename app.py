@@ -9,6 +9,8 @@ from routes.user_routes import user_bp
 from routes.author_routes import author_bp
 from routes.book_routes import book_bp
 from routes.category_routes import category_bp
+from routes.book_copy_routes import book_copy_bp
+
 
 def create_app():
     app = Flask(__name__)
@@ -36,6 +38,7 @@ def create_app():
     app.register_blueprint(author_bp, url_prefix='/api/authors')
     app.register_blueprint(book_bp, url_prefix='/api/books')
     app.register_blueprint(category_bp, url_prefix='/api/categories')
+    app.register_blueprint(book_copy_bp, url_prefix="/api/book_copies")
 
     return app
 
