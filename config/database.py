@@ -19,3 +19,30 @@ def init_db(app):
         # IMPORTANT: import models BEFORE create_all
         from models.user_model import User  # add more models here later
         db.create_all()
+        create_default_admin()
+
+
+def create_default_admin():
+    """Create default admin user if none exists"""
+    from models.user_model import User
+    from utils.password_utils import hash_password
+
+    # Check if any admin user exists
+    admin_exists = User.query.filter_by(role='admin').first()
+
+    if not admin_exists:
+        admin_password = hash_password('admin123')  # Default password
+        admin_user = User(
+            username='admin',
+            email='admin@library.com',
+            password=admin_password,
+            role='admin',
+            is_active=True
+        )
+
+        db.session.add(admin_user)
+        db.session.commit()
+
+        print("Default admin user created!")
+        print("Username: admin")
+        print("Password: admin123")
