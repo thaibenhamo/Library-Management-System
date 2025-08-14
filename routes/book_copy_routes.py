@@ -3,7 +3,6 @@ from flask import Blueprint, request, jsonify
 from services.book_copy_service import BookCopyService
 
 book_copy_bp = Blueprint('book_copy', __name__)
-
 book_copy_service = BookCopyService()
 
 
@@ -11,17 +10,14 @@ book_copy_service = BookCopyService()
 def get_all_book_copies():
     """Get all book copies"""
     copies = book_copy_service.get_all_copies()
+    return jsonify([copy.json() for copy in copies]), 200
 
-    return jsonify([copy.to_dict() for copy in copies]), 200
 
-
-# Not tested yet
 @book_copy_bp.route('/<int:book_copy_id>', methods=['GET'])
 def get_book_copy(book_copy_id):
     """Get a specific book copy by ID"""
     copy = book_copy_service.get_copy_by_id(book_copy_id)
-    if copy:
-        return jsonify(copy.to_dict()), 200
+    return jsonify(copy.json()), 200
 
 
 @book_copy_bp.route('', methods=['POST'])
@@ -67,3 +63,15 @@ def update_book_copy(book_copy_id):
         'message': 'Book copy edited successfully',
         'book_copy': copy.json()}), 201
 
+
+@book_copy_bp.route('/<int:book_copy_id>', methods=['DELETE'])
+def delete_book_copy(book_copy_id):
+    """Delete a book copy by ID"""
+    success, error = book_copy_service.delete_copy(book_copy_id)
+
+    if error:
+        if error == "Book copy not found":
+            return jsonify({'error': error}), 404
+        return jsonify({'error': error}), 400
+
+    return '', 204

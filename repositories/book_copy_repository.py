@@ -40,5 +40,17 @@ class BookCopyRepository:
             self.db_session.rollback()
             print(f"Error updating book copy {book_copy.id}: {e}")
 
-    # TODO: implement DELETE method
+    def delete(self, book_copy_id):
+        """Delete a book copy by ID"""
+        try:
+            book_copy = self.db_session.get(BookCopy, book_copy_id)
+            if book_copy:
+                self.db_session.delete(book_copy)
+                self.db_session.commit()
+                return True
+            return False
+        except Exception as e:
+            self.db_session.rollback()
+            print(f"Error deleting book copy {book_copy_id}: {e}")
+            return False
 
