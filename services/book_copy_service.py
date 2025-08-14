@@ -71,3 +71,14 @@ class BookCopyService:
         if copy:
             return copy, None
         return None, "Failed to edit book copy"
+
+    def delete_copy(self, book_copy_id):
+        """Delete a book copy"""
+        book_copy = self.book_copy_repo.get_by_id(book_copy_id)
+        if not book_copy:
+            return False, "Book copy not found"
+
+        success = self.book_copy_repo.delete(book_copy_id)
+        if success:
+            return True, None
+        return False, "Failed to delete book copy"
