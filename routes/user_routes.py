@@ -66,3 +66,18 @@ def delete_user(user_id):
         return jsonify({'message': message}), 404
     # 204 must not include a body
     return '', 204
+
+@user_bp.route('/login', methods=['POST'])
+def login():
+    data = request.get_json()
+    username = data.get('username')
+    password = data.get('password')
+
+    if not username or not password:
+        return jsonify({'error': 'Username and password are required'}), 400
+
+    user, error = user_service.authenticate_user(username, password)
+    if error:
+        return jsonify({'error': error}), 401
+
+    return jsonify({'message': 'Login successful', 'user': user.to_dict()}), 200

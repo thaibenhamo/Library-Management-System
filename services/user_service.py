@@ -1,6 +1,8 @@
 from models.user_model import User
 from repositories.user_repository import UserRepository
 import re
+from werkzeug.security import generate_password_hash
+from werkzeug.security import check_password_hash
 
 
 class UserService:
@@ -28,8 +30,9 @@ class UserService:
             return None, "Username already taken."
         if email and self.user_repository.find_by_email(email):
             return None, "Email already in use."
+        hashed_password = generate_password_hash(password)
 
-        user = User(username=username, password=password, email=email)
+        user = User(username=username, password=hashed_password, email=email)
         return self.user_repository.save(user)
     
     def get_user_by_id(self, user_id):
@@ -65,3 +68,9 @@ class UserService:
             return False, "User not found"
         
         return self.user_repository.delete(user)
+
+    def authenticate_user(self, username, password):
+        user = self.user_repository.find_by_username(username)
+        if user and check_password_hash(user.password, password):
+            return user, None
+        return None, "Invalid credentials"
