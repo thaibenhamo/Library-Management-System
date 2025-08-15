@@ -7,7 +7,6 @@ from services.book_service import BookService
 class BookCopyService:
     def __init__(self):
         self.book_copy_repo = BookCopyRepository()
-        # TODO: change to book_repo after creation
         self.book_service = BookService()
 
     def get_all_copies(self):
@@ -23,7 +22,6 @@ class BookCopyService:
         if not isinstance(book_id, int):
             return None, "Book_id must be an integer"
 
-        # TODO: change to book_repo after creation
         book = self.book_service.get_book_by_id(book_id)
 
         if not book:

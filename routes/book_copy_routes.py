@@ -41,6 +41,7 @@ def create_book_copy():
 
     if error:
         return jsonify({'error': error}), 400
+
     return jsonify({
         'message': 'Book copy created successfully',
         'book_copy': copy.json()}), 201
@@ -55,7 +56,6 @@ def update_book_copy(book_copy_id):
         return jsonify({'error': 'No JSON data provided'}), 400
 
     copy, error = book_copy_service.update_copy(data, book_copy_id)
-
     if error:
         return jsonify({'error': error}), 400
 
@@ -68,10 +68,8 @@ def update_book_copy(book_copy_id):
 def delete_book_copy(book_copy_id):
     """Delete a book copy by ID"""
     success, error = book_copy_service.delete_copy(book_copy_id)
-
     if error:
         if error == "Book copy not found":
             return jsonify({'error': error}), 404
         return jsonify({'error': error}), 400
-
     return '', 204

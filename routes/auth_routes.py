@@ -27,7 +27,6 @@ def login():
         if error:
             return jsonify({'error': error}), 401
 
-        # JWT token creation
         additional_claims = {
             "role": user.role,
             "user_id": user.id
@@ -61,9 +60,7 @@ def logout():
     Simple logout - returns success message
     """
     try:
-        # Get current user from JWT
         current_user_id = get_jwt_identity()
-
         auth_service.log_logout(current_user_id)
 
         return jsonify({
