@@ -1,8 +1,18 @@
 from flask import Blueprint, request, jsonify
 from services.book_service import BookService
+from services.fill_books_service import FillBooksService
+
+import requests
+from flask import request
+from models.book_model import Book
+from models.Author_model import Author
+from models.category_model import Category
+from extensions import db
+from sqlalchemy.exc import SQLAlchemyError
 
 book_bp = Blueprint('book_bp', __name__)
 book_service = BookService()
+fill_books_service = FillBooksService()
 
 @book_bp.route('', methods=['POST'])
 def add_book():
@@ -59,3 +69,19 @@ def delete_book(book_id):
         return jsonify({'error': message}), 404
 
     return jsonify({'message': message}), 204
+
+@book_bp.route('/fill_external', methods=['POST'])
+def fill_books():
+    data = request.get_json()
+    query = data.get('query', 'fiction')
+    limit = min(int(data.get('limit', 10)), 40)
+
+    try:
+        created = fill_books_service.fetch_and_store_books(query, limit)
+        return jsonify({
+            "message": f"{len(created)} books added",
+            "books": created
+        }), 201
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"error": str(e)}), 500
