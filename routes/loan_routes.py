@@ -39,4 +39,22 @@ def create_loan():
     except Exception as e:
         return jsonify({'error': str(e)}), 400
 
+@loan_bp.route('/<int:loan_id>/return', methods=['PUT'])
+def return_book(loan_id):
+    loan, error = loan_service.return_loan(loan_id)
+
+    if error:
+        return jsonify({'error': error}), 400
+
+    return jsonify({
+        'message': 'Book returned successfully',
+        'loan': loan
+    }), 200
+
+@loan_bp.route('/<int:loan_id>', methods=['GET'])
+def get_loan_by_id(loan_id):
+    loan = loan_service.get_loan_by_id(loan_id)
+    if not loan:
+        return jsonify({'error': 'Loan not found'}), 404
+    return jsonify({'loan': loan}), 200
 

@@ -33,3 +33,18 @@ class LoanRepository:
         except Exception as e:
             print(f"Error fetching active loans: {e}")
             return []
+
+    def get_by_id(self, loan_id):
+        return self.db_session.get(Loan, loan_id)
+
+    def update(self, loan):
+        try:
+            self.db_session.commit()
+            return True
+        except Exception as e:
+            self.db_session.rollback()
+            print(f"Error updating loan: {e}")
+            return False
+
+
+

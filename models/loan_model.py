@@ -10,6 +10,8 @@ class Loan(db.Model):
     return_date = db.Column(db.Date, nullable=False, default=lambda: date.today() + timedelta(days=14))
     is_returned = db.Column(db.Boolean, default=False)
 
+    book_copy = db.relationship('BookCopy', backref='loans', lazy=True)
+
     def json(self):
         return {
             'id': self.id,
