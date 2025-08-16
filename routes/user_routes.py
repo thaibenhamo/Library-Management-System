@@ -1,5 +1,6 @@
 from flask import Blueprint, request, jsonify
 from services.user_service import UserService
+from flask_jwt_extended import create_access_token
 
 user_bp = Blueprint('user_bp', __name__)
 user_service = UserService()
@@ -80,4 +81,22 @@ def login():
     if error:
         return jsonify({'error': error}), 401
 
-    return jsonify({'message': 'Login successful', 'user': user.to_dict()}), 200
+    access_token = create_access_token(identity=user.id)  # Store user.id in the token
+
+    return jsonify({
+        'message': 'Login successful',
+        'access_token': access_token,
+        'user': user.to_dict()
+    }), 200
+
+@user_bp.route('/<int:user_id>', methods=['PUT'])
+def update_user(user_id):
+    data = request.get_json()
+    if not data:
+        return jsonify({'error': 'No input data provided'}), 400
+
+    updated_user, error = user_service.update_user(user_id, data)
+    if error:
+        return jsonify({'error': error}), 400
+
+    return jsonify(updated_user.json()), 200

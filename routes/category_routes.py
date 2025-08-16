@@ -37,3 +37,16 @@ def delete_category(category_id):
     if not success:
         return jsonify({'error': error}), 404
     return jsonify({'message': 'Category deleted'}), 204
+
+
+@category_bp.route('/<int:category_id>', methods=['PUT'])
+def update_category(category_id):
+    data = request.get_json()
+    if not data or 'name' not in data:
+        return jsonify({'error': 'Name is required'}), 400
+
+    updated_category, error = category_service.update_category(category_id, data['name'])
+    if error:
+        return jsonify({'error': error}), 400
+
+    return jsonify(updated_category.json()), 200

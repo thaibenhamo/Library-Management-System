@@ -27,3 +27,17 @@ class CategoryService:
             return False, "Category not found"
         self.repo.delete(category)
         return True, None
+
+    def update_category(self, category_id, new_name):
+        category = self.repo.find_by_id(category_id)
+        if not category:
+            return None, "Category not found"
+
+        category.name = new_name
+
+        try:
+            self.repo.save(category)
+            return category, None
+        except Exception as e:
+            return None, str(e)
+

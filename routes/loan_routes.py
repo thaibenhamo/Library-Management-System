@@ -1,29 +1,29 @@
 from flask import Blueprint, request, jsonify
+from flask_jwt_extended import jwt_required, get_jwt_identity
 from services.loan_service import LoanService
 
 loan_bp = Blueprint('loan_bp', __name__)
 loan_service = LoanService()
 
-
 @loan_bp.route('', methods=['GET'])
 def get_all_loans():
-    """Get all loans"""
-    loans = loan_service.get_all_loans()
+    """Get all loans for current user"""
+    current_user_id = get_jwt_identity()
+    loans = loan_service.get_loans_by_user(current_user_id)
     return jsonify({'loans': loans}), 200
 
 
-# Not tested yet
 @loan_bp.route('', methods=['POST'])
 def create_loan():
     """Create a new loan"""
     try:
         data = request.get_json()
+        current_user_id = get_jwt_identity()
 
-        required_fields = ['user_id', 'book_copy_id']
-        for field in required_fields:
-            if field not in data:
-                return jsonify({'error': f'Missing required field: {field}'}), 400
+        if not data.get('book_copy_id'):
+            return jsonify({'error': 'Missing required field: book_copy_id'}), 400
 
+        data['user_id'] = current_user_id
         loan, error = loan_service.create_loan(data)
 
         if error:
@@ -39,9 +39,11 @@ def create_loan():
     except Exception as e:
         return jsonify({'error': str(e)}), 400
 
+
 @loan_bp.route('/<int:loan_id>/return', methods=['PUT'])
 def return_book(loan_id):
-    loan, error = loan_service.return_loan(loan_id)
+    current_user_id = get_jwt_identity()
+    loan, error = loan_service.return_loan(loan_id, current_user_id)
 
     if error:
         return jsonify({'error': error}), 400
@@ -51,10 +53,11 @@ def return_book(loan_id):
         'loan': loan
     }), 200
 
+
 @loan_bp.route('/<int:loan_id>', methods=['GET'])
 def get_loan_by_id(loan_id):
-    loan = loan_service.get_loan_by_id(loan_id)
-    if not loan:
-        return jsonify({'error': 'Loan not found'}), 404
+    current_user_id = get_jwt_identity()
+    loan, error = loan_service.get_loan_by_id_for_user(loan_id, current_user_id)
+    if error:
+        return jsonify({'error': error}), 404
     return jsonify({'loan': loan}), 200
-

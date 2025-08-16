@@ -10,9 +10,9 @@ class LoanService:
         self.book_copy_repo = BookCopyRepository()
         self.user_repo = UserRepository()
 
-    def get_all_loans(self):
-        """Get all loans"""
-        loans = self.loan_repo.get_all()
+    def get_loans_by_user(self, user_id):
+        """Get all loans for a specific user"""
+        loans = self.loan_repo.get_by_user_id(user_id)
         return [loan.json() for loan in loans]
 
     def create_loan(self, loan_data):
@@ -23,7 +23,7 @@ class LoanService:
         if 'return_date' not in loan_data or loan_data['return_date'] is None:
             loan_data['return_date'] = date.today() + timedelta(days=14)
 
-            # Validate book_copy exists
+        # Validate book_copy exists
         book_copy = self.book_copy_repo.get_by_id(loan_data['book_copy_id'])
         if not book_copy:
             return None, "Book copy does not exist"
@@ -37,18 +37,22 @@ class LoanService:
         active_loans = self.loan_repo.get_active_loans()
         for loan in active_loans:
             if loan.book_copy_id == loan_data.get('book_copy_id'):
-                return None, "Book copy is already on loan"
+                return None, "Book is already on loan"
 
         loan = self.loan_repo.create(loan_data)
         if loan:
             return loan.json(), None
         return None, "Failed to create loan"
 
-    def return_loan(self, loan_id):
+    def return_loan(self, loan_id, user_id):
+        """Return a loaned book, only if the loan belongs to the user"""
         loan = self.loan_repo.get_by_id(loan_id)
 
         if not loan:
             return None, "Loan not found"
+
+        if loan.user_id != user_id:
+            return None, "Unauthorized access to this loan"
 
         if loan.is_returned:
             return None, "Book already returned"
@@ -63,12 +67,11 @@ class LoanService:
 
         return loan.json(), None
 
-
-    def get_loan_by_id(self, loan_id):
+    def get_loan_by_id_for_user(self, loan_id, user_id):
+        """Get a loan by ID, but only if it belongs to the current user"""
         loan = self.loan_repo.get_by_id(loan_id)
-        if loan:
-            return loan.json()
-        return None
-
-
-
+        if not loan:
+            return None, "Loan not found"
+        if loan.user_id != user_id:
+            return None, "Unauthorized"
+        return loan.json(), None

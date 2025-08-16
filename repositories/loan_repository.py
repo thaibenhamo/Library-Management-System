@@ -46,5 +46,6 @@ class LoanRepository:
             print(f"Error updating loan: {e}")
             return False
 
-
+    def get_by_user_id(self, user_id):
+        return self.db_session.query(Loan).filter_by(user_id=user_id).all()
 
