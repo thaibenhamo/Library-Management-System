@@ -104,6 +104,8 @@ def fill_books():
 
     try:
         created = fill_books_service.fetch_and_store_books(query, limit)
+        print(f"FillBooksService called with query='{query}' and limit={limit}")
+
         return jsonify({
             "message": f"{len(created)} books added",
             "books": created
@@ -111,3 +113,13 @@ def fill_books():
     except Exception as e:
         db.session.rollback()
         return jsonify({"error": str(e)}), 500
+
+
+@book_bp.route('/by-title/<string:title>', methods=['GET'])
+def get_book_by_title(title):
+    """Get a book by its title"""
+    book = book_service.get_book_by_title(title)
+    if not book:
+        return jsonify({'error': 'Book not found'}), 404
+    return jsonify(book.json()), 200
+

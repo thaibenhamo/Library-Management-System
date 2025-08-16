@@ -1,6 +1,6 @@
 from models.book_model import Book
 from extensions import db
-
+from sqlalchemy import func
 
 class BookRepository:
     def __init__(self, db_session=None):
@@ -44,6 +44,14 @@ class BookRepository:
             self.db_session.rollback()
             return None, f"Error creating book: {e}"
 
+    def save_for_api(self, book):
+        try:
+            self.db_session.add(book)
+            return book, None
+        except Exception as e:
+            self.db_session.rollback()
+            return None, f"Error creating book: {e}"
+
     def delete(self, book_id):
         """Delete a book by ID"""
         try:
@@ -67,3 +75,13 @@ class BookRepository:
             self.db_session.rollback()
             print(f"Error updating book {book.id}: {e}")
             return None
+
+    def commit(self):
+        db.session.commit()
+
+    def find_by_title(self, title):
+        title = title.strip()
+        return db.session.query(Book).filter(func.lower(Book.title) == func.lower(title)).first()
+
+
+

@@ -13,6 +13,7 @@ from routes.book_copy_routes import book_copy_bp
 from routes.loan_routes import loan_bp
 
 
+
 def create_app():
     app = Flask(__name__)
 

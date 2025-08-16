@@ -22,20 +22,28 @@ class FillBooksService:
         for item in items:
             info = item.get("volumeInfo", {})
             title = info.get("title")
+
             if not title:
                 continue
 
             author_name = info.get("authors", ["Unknown Author"])[0]
             category_name = info.get("categories", ["General"])[0]
 
-            author = self.author_repo.find_by_name(author_name) or self.author_repo.save(Author(name=author_name))
-            category = self.category_repo.find_by_name(category_name) or self.category_repo.save(Category(name=category_name))
+            author = self.author_repo.find_by_name(author_name)
+            if not author:
+                author = Author(name=author_name)
+                self.author_repo.save(author)
+
+            category = self.category_repo.find_by_name(category_name)
+            if not category:
+                category = Category(name=category_name)
+                self.category_repo.save(category)
 
             if self.book_repo.find_by_title_and_author(title, author.id):
                 continue
 
             book = Book(title=title, author_id=author.id, category_id=category.id)
-            self.book_repo.save(book)
+            self.book_repo.save_for_api(book)
             created.append(title)
 
         db.session.commit()

@@ -1,27 +1,29 @@
 from models.category_model import Category
-from extensions import db
+from repositories.category_repository import CategoryRepository
 
 class CategoryService:
+    def __init__(self):
+        self.repo = CategoryRepository()
+
     def create_category(self, name):
-        existing = Category.query.filter_by(name=name).first()
+        existing = self.repo.find_by_name(name)
         if existing:
             return None, "Category already exists"
 
         category = Category(name=name)
-        db.session.add(category)
-        db.session.commit()
+        self.repo.save(category)
+        self.repo.commit()
         return category, None
 
     def get_all_categories(self):
-        return Category.query.all()
+        return self.repo.find_all()
 
     def get_category_by_id(self, category_id):
-        return Category.query.get(category_id)
+        return self.repo.find_by_id(category_id)
 
     def delete_category(self, category_id):
-        category = self.get_category_by_id(category_id)
+        category = self.repo.find_by_id(category_id)
         if not category:
             return False, "Category not found"
-        db.session.delete(category)
-        db.session.commit()
+        self.repo.delete(category)
         return True, None

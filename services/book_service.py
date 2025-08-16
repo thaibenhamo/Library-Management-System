@@ -98,3 +98,6 @@ class BookService:
             return True, None
         return False, "Failed to delete book"
 
+    def get_book_by_title(self, title):
+        return self.book_repo.find_by_title(title)
+
