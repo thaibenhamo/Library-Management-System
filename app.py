@@ -11,7 +11,7 @@ from routes.book_routes import book_bp
 from routes.category_routes import category_bp
 from routes.book_copy_routes import book_copy_bp
 from routes.loan_routes import loan_bp
-
+from routes.export_routes import export_bp
 
 
 def create_app():
@@ -42,6 +42,7 @@ def create_app():
     app.register_blueprint(category_bp, url_prefix='/api/categories')
     app.register_blueprint(book_copy_bp, url_prefix="/api/book_copies")
     app.register_blueprint(loan_bp, url_prefix="/api/loans")
+    app.register_blueprint(export_bp, url_prefix="/api/export")
 
     return app
 
