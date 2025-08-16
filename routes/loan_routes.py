@@ -1,5 +1,4 @@
 from flask import Blueprint, request, jsonify
-from flask_jwt_extended import jwt_required, get_jwt_identity
 from services.loan_service import LoanService
 
 loan_bp = Blueprint('loan_bp', __name__)
@@ -8,7 +7,10 @@ loan_service = LoanService()
 @loan_bp.route('', methods=['GET'])
 def get_all_loans():
     """Get all loans for current user"""
-    current_user_id = get_jwt_identity()
+    current_user_id = request.args.get('user_id', type=int)
+    if not current_user_id:
+        return jsonify({'error': 'Missing user_id in query parameters'}), 400
+
     loans = loan_service.get_loans_by_user(current_user_id)
     return jsonify({'loans': loans}), 200
 
@@ -18,10 +20,16 @@ def create_loan():
     """Create a new loan"""
     try:
         data = request.get_json()
-        current_user_id = get_jwt_identity()
+        if not data:
+            return jsonify({'error': 'Missing JSON body'}), 400
 
-        if not data.get('book_copy_id'):
-            return jsonify({'error': 'Missing required field: book_copy_id'}), 400
+        current_user_id = data.get('user_id')
+        book_copy_id = data.get('book_copy_id')
+
+        if not current_user_id:
+            return jsonify({'error': 'Missing user_id'}), 400
+        if not book_copy_id:
+            return jsonify({'error': 'Missing book_copy_id'}), 400
 
         data['user_id'] = current_user_id
         loan, error = loan_service.create_loan(data)
@@ -42,8 +50,13 @@ def create_loan():
 
 @loan_bp.route('/<int:loan_id>/return', methods=['PUT'])
 def return_book(loan_id):
-    current_user_id = get_jwt_identity()
-    loan, error = loan_service.return_loan(loan_id, current_user_id)
+    data = request.get_json()
+
+    if not data or 'user_id' not in data:
+        return jsonify({'error': 'Missing user_id in request body'}), 400
+
+    user_id = data['user_id']
+    loan, error = loan_service.return_loan(loan_id, user_id)
 
     if error:
         return jsonify({'error': error}), 400
@@ -56,7 +69,10 @@ def return_book(loan_id):
 
 @loan_bp.route('/<int:loan_id>', methods=['GET'])
 def get_loan_by_id(loan_id):
-    current_user_id = get_jwt_identity()
+    current_user_id = request.args.get('user_id', type=int)
+    if not current_user_id:
+        return jsonify({'error': 'Missing user_id in query parameters'}), 400
+
     loan, error = loan_service.get_loan_by_id_for_user(loan_id, current_user_id)
     if error:
         return jsonify({'error': error}), 404
