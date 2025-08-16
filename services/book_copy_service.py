@@ -80,3 +80,23 @@ class BookCopyService:
         if success:
             return True, None
         return False, "Failed to delete book copy"
+
+    def get_available_copies_with_counts(self):
+        available_copies = self.book_copy_repo.get_available_copies()
+
+        # Aggregate count per book_id
+        book_counts = {}
+        for copy in available_copies:
+            book_id = copy.book_id
+            if book_id not in book_counts:
+                book_counts[book_id] = {
+                    "title": copy.book.title if copy.book else "Unknown",
+                    "count": 0
+                }
+            book_counts[book_id]["count"] += 1
+
+        # Format response
+        return {
+            "available_copies": [copy.json() for copy in available_copies],
+            "count_per_book": book_counts
+        }

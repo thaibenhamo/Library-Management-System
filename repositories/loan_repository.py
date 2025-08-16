@@ -49,3 +49,8 @@ class LoanRepository:
     def get_by_user_id(self, user_id):
         return self.db_session.query(Loan).filter_by(user_id=user_id).all()
 
+    def count_all_loans(self):
+        return self.db_session.query(Loan).count()
+
+    def count_loans_by_return_status(self, returned=True):
+        return self.db_session.query(Loan).filter_by(is_returned=returned).count()

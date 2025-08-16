@@ -75,3 +75,18 @@ class LoanService:
         if loan.user_id != user_id:
             return None, "Unauthorized"
         return loan.json(), None
+
+    def get_loan_statistics(self):
+        total = self.loan_repo.count_all_loans()
+        returned = self.loan_repo.count_loans_by_return_status(True)
+        not_returned = self.loan_repo.count_loans_by_return_status(False)
+
+        return {
+            'total_loans': total,
+            'returned_loans': returned,
+            'not_returned_loans': not_returned
+        }
+
+
+
+

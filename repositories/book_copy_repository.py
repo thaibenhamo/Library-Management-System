@@ -54,3 +54,5 @@ class BookCopyRepository:
             print(f"Error deleting book copy {book_copy_id}: {e}")
             return False
 
+    def get_available_copies(self):
+        return self.db_session.query(BookCopy).filter_by(available=True).all()

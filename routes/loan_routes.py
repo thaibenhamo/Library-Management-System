@@ -77,3 +77,22 @@ def get_loan_by_id(loan_id):
     if error:
         return jsonify({'error': error}), 404
     return jsonify({'loan': loan}), 200
+
+@loan_bp.route('/stats', methods=['GET'])
+def loan_statistics():
+    """Returns total loans, returned and not returned counts"""
+    stats = loan_service.get_loan_statistics()
+    return jsonify(stats), 200
+
+
+@loan_bp.route('/user/<int:user_id>', methods=['GET'])
+def get_loans_by_user_id(user_id):
+    """Return loan history for a specific user"""
+    loans = loan_service.get_loans_by_user(user_id)
+    return jsonify({'loans': loans}), 200
+
+@loan_bp.route('/stats', methods=['GET'])
+def loan_stats():
+    stats = loan_service.get_loan_statistics()
+    return jsonify(stats), 200
+

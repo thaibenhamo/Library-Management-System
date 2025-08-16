@@ -73,3 +73,9 @@ def delete_book_copy(book_copy_id):
             return jsonify({'error': error}), 404
         return jsonify({'error': error}), 400
     return '', 204
+
+@book_copy_bp.route('/availability', methods=['GET'])
+def get_available_book_copies():
+    """List all available book copies with count per book"""
+    copies = book_copy_service.get_available_copies_with_counts()
+    return jsonify(copies), 200
