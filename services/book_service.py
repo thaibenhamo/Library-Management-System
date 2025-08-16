@@ -1,3 +1,8 @@
+"""
+Service layer for managing book-related operations.
+Coordinates validation and cross-entity checks for authors and categories.
+"""
+
 from models.book_model import Book
 from repositories.book_repository import BookRepository
 from services.author_service import AuthorService
@@ -11,14 +16,19 @@ class BookService:
         self.category_service = CategoryService()
 
     def get_all_books(self):
-        """Get all books"""
+        """Return a list of all books."""
         return self.book_repo.find_all()
 
     def get_book_by_id(self, book_id):
-        """Get book by ID"""
+        """Return a single book by its ID."""
         return self.book_repo.get_by_id(book_id)
 
     def create_book(self, title, author_id, category_id):
+        """
+        Create a new book.
+        Validates title, author existence, and category existence.
+        Ensures uniqueness by title.
+        """
         if not isinstance(title, str) or not title.strip():
             return None, "Title must be a non-empty string"
 
@@ -28,25 +38,24 @@ class BookService:
         if not isinstance(category_id, int):
             return None, "Category_id must be an integer"
 
-        existing_book = self.book_repo.get_by_title(title.strip())
-        if existing_book:
+        if self.book_repo.get_by_title(title.strip()):
             return None, "Book with this title already exists"
 
         if not self.author_service.get_author_by_id(author_id):
             return None, "Author not found"
+
         if not self.category_service.get_category_by_id(category_id):
             return None, "Category not found"
 
         book = Book(title=title.strip(), author_id=author_id, category_id=category_id)
-
         saved_book, save_error = self.book_repo.save(book)
-        if save_error:
-            return None, save_error
-
-        return saved_book, None
+        return (saved_book, None) if saved_book else (None, save_error)
 
     def update_book(self, book_id, data):
-        """Update a book"""
+        """
+        Update book details (title, author, category).
+        Validates inputs and ensures uniqueness for title.
+        """
         book = self.book_repo.get_by_id(book_id)
         if not book:
             return None, "Book not found"
@@ -56,9 +65,8 @@ class BookService:
             if not isinstance(title, str) or not title.strip():
                 return None, "Title must be a non-empty string"
 
-            # Check if new title already exists (excluding current book)
-            existing_book = self.book_repo.get_by_title(title.strip())
-            if existing_book and existing_book.id != book_id:
+            existing = self.book_repo.get_by_title(title.strip())
+            if existing and existing.id != book_id:
                 return None, "Book with this title already exists"
 
             book.title = title.strip()
@@ -79,13 +87,14 @@ class BookService:
                 return None, "Category not found"
             book.category_id = category_id
 
-        updated_book = self.book_repo.update(book)
-        if updated_book:
-            return updated_book, None
-        return None, "Failed to update book"
+        updated = self.book_repo.update(book)
+        return (updated, None) if updated else (None, "Failed to update book")
 
     def delete_book(self, book_id):
-        """Delete a book"""
+        """
+        Delete a book by ID.
+        Prevents deletion if the book has existing copies.
+        """
         book = self.book_repo.get_by_id(book_id)
         if not book:
             return False, "Book not found"
@@ -94,10 +103,8 @@ class BookService:
             return False, "Cannot delete book with existing copies"
 
         success = self.book_repo.delete(book_id)
-        if success:
-            return True, None
-        return False, "Failed to delete book"
+        return (True, None) if success else (False, "Failed to delete book")
 
     def get_book_by_title(self, title):
+        """Return a book by its title."""
         return self.book_repo.find_by_title(title)
-
