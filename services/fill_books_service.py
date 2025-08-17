@@ -5,7 +5,7 @@ Automatically handles creation of authors, categories, and books if they do not 
 
 import requests
 from models.book_model import Book
-from models.Author_model import Author
+from models.author_model import Author
 from models.category_model import Category
 from repositories.author_repository import AuthorRepository
 from repositories.category_repository import CategoryRepository

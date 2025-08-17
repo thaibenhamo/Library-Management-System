@@ -1,4 +1,4 @@
-from models.Author_model import Author
+from models.author_model import Author
 from extensions import db
 
 class AuthorRepository:

@@ -9,9 +9,6 @@ class BookCopy(db.Model):
     available = db.Column(db.Boolean, default=True, nullable=False)
     location = db.Column(db.String(100), nullable=False)  # shelf location
 
-    # TODO: add when loan is implemented
-    # loans = db.relationship('Loan', backref='book_copy', lazy=True)
-
     def json(self):
         return {
             'id': self.id,

@@ -65,29 +65,8 @@ def delete_user(user_id):
     success, message = user_service.delete_user(user_id)
     if not success:
         return jsonify({'message': message}), 404
-    # 204 must not include a body
+
     return '', 204
-
-@user_bp.route('/login', methods=['POST'])
-def login():
-    data = request.get_json()
-    username = data.get('username')
-    password = data.get('password')
-
-    if not username or not password:
-        return jsonify({'error': 'Username and password are required'}), 400
-
-    user, error = user_service.authenticate_user(username, password)
-    if error:
-        return jsonify({'error': error}), 401
-
-    access_token = create_access_token(identity=user.id)  # Store user.id in the token
-
-    return jsonify({
-        'message': 'Login successful',
-        'access_token': access_token,
-        'user': user.to_dict()
-    }), 200
 
 @user_bp.route('/<int:user_id>', methods=['PUT'])
 def update_user(user_id):

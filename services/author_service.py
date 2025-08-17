@@ -3,7 +3,7 @@ Service layer for managing Author operations.
 Handles business logic between routes and the Author repository.
 """
 
-from models.Author_model import Author
+from models.author_model import Author
 from repositories.author_repository import AuthorRepository
 
 class AuthorService:

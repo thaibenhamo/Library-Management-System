@@ -6,7 +6,7 @@ Each route returns a downloadable spreadsheet of a specific entity.
 from flask import Blueprint, send_file
 from extensions import db
 from models.book_model import Book
-from models.Author_model import Author
+from models.author_model import Author
 from models.category_model import Category
 from models.book_copy_model import BookCopy
 from models.loan_model import Loan
