@@ -41,9 +41,6 @@ class CategoryRepository:
         """
         Retrieve all categories from the database.
 
-        Args:
-            None
-
         Returns:
             list[Category]: List of all Category instances.
         """
@@ -66,9 +63,6 @@ class CategoryRepository:
     def commit(self):
         """
         Commit current database transaction.
-
-        Args:
-            None
 
         Returns:
             None

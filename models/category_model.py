@@ -25,9 +25,6 @@ class Category(db.Model):
         """
         Convert Category object to JSON-serializable dictionary.
 
-        Args:
-            None
-
         Returns:
             dict: Dictionary containing category id and name.
         """

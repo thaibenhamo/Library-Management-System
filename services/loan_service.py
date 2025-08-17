@@ -1,15 +1,22 @@
-"""
-Service layer for managing book loans.
-Handles creation, return, retrieval, and statistics for loan records.
-"""
-
 from repositories.loan_repository import LoanRepository
 from repositories.book_copy_repository import BookCopyRepository
 from repositories.user_repository import UserRepository
 from datetime import date, timedelta
 
+
 class LoanService:
+    """
+    Service for business logic related to book loans.
+
+    Attributes:
+        loan_repo (LoanRepository): Repository for loan persistence.
+        book_copy_repo (BookCopyRepository): Repository for book copy queries.
+        user_repo (UserRepository): Repository for user validation.
+    """
     def __init__(self):
+        """
+        Initialize service with repository dependencies.
+        """
         self.loan_repo = LoanRepository()
         self.book_copy_repo = BookCopyRepository()
         self.user_repo = UserRepository()

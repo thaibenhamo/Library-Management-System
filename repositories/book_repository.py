@@ -25,18 +25,12 @@ class BookRepository:
 
         Args:
             db_session (Session, optional): Custom database session, defaults to db.session.
-
-        Returns:
-            None
         """
         self.db_session = db_session or db.session
 
     def find_all(self):
         """
         Retrieve all books from the database with error handling.
-
-        Args:
-            None
 
         Returns:
             list[Book]: List of all Book instances, empty list on error.
@@ -155,9 +149,6 @@ class BookRepository:
     def commit(self):
         """
         Commit current database transaction.
-
-        Args:
-            None
 
         Returns:
             None

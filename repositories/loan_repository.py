@@ -24,18 +24,12 @@ class LoanRepository:
 
         Args:
             db_session (Session, optional): Custom database session, defaults to db.session.
-
-        Returns:
-            None
         """
         self.db_session = db_session or db.session
 
     def get_all(self):
         """
         Retrieve all loans from the database with error handling.
-
-        Args:
-            None
 
         Returns:
             list[Loan]: List of all Loan instances, empty list on error.
@@ -69,9 +63,6 @@ class LoanRepository:
     def get_active_loans(self):
         """
         Retrieve all active (non-returned) loans with error handling.
-
-        Args:
-            None
 
         Returns:
             list[Loan]: List of Loan instances where is_returned=False, empty list on error.
@@ -127,9 +118,6 @@ class LoanRepository:
     def count_all_loans(self):
         """
         Get total count of all loans in the database.
-
-        Args:
-            None
 
         Returns:
             int: Total number of loan records.

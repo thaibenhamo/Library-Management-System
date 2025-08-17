@@ -35,9 +35,6 @@ class BookCopyRepository:
         """
         Retrieve all book copies from the database.
 
-        Args:
-            None
-
         Returns:
             list[BookCopy]: List of all BookCopy instances.
 
@@ -125,9 +122,6 @@ class BookCopyRepository:
     def get_available_copies(self):
         """
         Retrieve all currently available book copies.
-
-        Args:
-            None
 
         Returns:
             list[BookCopy]: List of BookCopy instances where available=True.

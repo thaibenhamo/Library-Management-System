@@ -28,13 +28,10 @@ class BookCopy(db.Model):
 
     def json(self):
         """
-            Convert BookCopy object to JSON-serializable dictionary.
+        Convert BookCopy object to JSON-serializable dictionary.
 
-            Args:
-                None
-
-            Returns:
-                dict: Dictionary containing book copy id, book_id, availability status, and location.
+        Returns:
+            dict: Dictionary containing book copy id, book_id, availability status, and location.
         """
         return {
             'id': self.id,

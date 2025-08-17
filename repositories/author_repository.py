@@ -41,9 +41,6 @@ class AuthorRepository:
         """
         Retrieve all authors from the database.
 
-        Args:
-            None
-
         Returns:
             list[Author]: List of all Author instances.
         """
@@ -66,9 +63,6 @@ class AuthorRepository:
     def commit(self):
         """
         Commit current database transaction.
-
-        Args:
-            None
 
         Returns:
             None

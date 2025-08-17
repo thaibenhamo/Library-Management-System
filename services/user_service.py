@@ -1,8 +1,3 @@
-"""
-Service layer for user-related operations.
-Handles user creation, validation, retrieval, authentication, and updates.
-"""
-
 import re
 from models.user_model import User
 from repositories.user_repository import UserRepository
@@ -11,18 +6,35 @@ from werkzeug.security import check_password_hash  # required for authenticate_u
 
 
 class UserService:
+    """
+    Service for business logic related to users.
+
+    Attributes:
+        user_repository (UserRepository): Repository for user persistence.
+    """
     USERNAME_RE = r"^[A-Za-z][a-zA-Z0-9_]{2,15}$"
     EMAIL_RE = r"^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$"
     PASSWORD_RE = r"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,32}$"
 
     def __init__(self, user_repository=None):
+        """
+        Initialize service with user repository.
+
+        Args:
+            user_repository (UserRepository, optional): Custom repository, defaults to UserRepository().
+        """
         self.user_repository = user_repository or UserRepository()
 
     def is_username_unique(self, username, exclude_user_id=None):
         """
         Check if username is unique.
 
-        Returns tuple: (True, None) if unique, (False, error).
+        Args:
+            username (str): Username to check.
+            exclude_user_id (int, optional): User ID to exclude from check (for updates).
+
+        Returns:
+            tuple[bool, str | None]: (True, None) if unique, (False, error) if taken.
         """
         existing_user = self.user_repository.find_by_username(username)
         if not existing_user:
@@ -33,7 +45,14 @@ class UserService:
 
     def is_email_unique(self, email, exclude_user_id=None):
         """
-        Check if email is unique. Returns tuple: (True, None) if unique, (False, error).
+        Check if email is unique.
+
+        Args:
+            email (str): Email to check.
+            exclude_user_id (int, optional): User ID to exclude from check (for updates).
+
+        Returns:
+            tuple[bool, str | None]: (True, None) if unique, (False, error) if in use.
         """
         existing_user = self.user_repository.find_by_email(email)
         if not existing_user:
@@ -133,7 +152,7 @@ class UserService:
             user_id (int): User ID.
 
         Returns:
-            User | None
+            User | None: Found user or None.
         """
         return self.user_repository.find_by_id(user_id)
 
@@ -145,7 +164,7 @@ class UserService:
             email (str): User's email address.
 
         Returns:
-            User | None
+            User | None: Found user or None.
         """
         return self.user_repository.find_by_email(email)
 
@@ -157,7 +176,7 @@ class UserService:
             username (str): Username.
 
         Returns:
-            User | None
+            User | None: Found user or None.
         """
         return self.user_repository.find_by_username(username)
 
@@ -166,7 +185,7 @@ class UserService:
         Retrieve all users in the system.
 
         Returns:
-            list[User]
+            list[User]: All users.
         """
         return self.user_repository.find_all()
 
@@ -185,22 +204,6 @@ class UserService:
             return False, "User not found"
 
         return self.user_repository.delete(user)
-
-    def authenticate_user(self, username, password):
-        """
-        Validate user credentials.
-
-        Args:
-            username (str): Username.
-            password (str): Raw password.
-
-        Returns:
-            tuple[User | None, str | None]: Authenticated user or error message.
-        """
-        user = self.user_repository.find_by_username(username)
-        if user and check_password_hash(user.password, password):
-            return user, None
-        return None, "Invalid credentials"
 
     def update_user(self, user_id, data):
         """
@@ -222,14 +225,14 @@ class UserService:
             valid, error = UserService.validate_username(username)
             if not valid:
                 return None, error
-            ok, err = self.is_username_unique(username)
+            ok, err = self.is_username_unique(username, user.id)
             if not ok:
                 return None, err
             user.username = username
 
         email = data.get('email')
         if email is not None:
-            valid, error = UserService.validate_email(email)
+            valid, error = UserService.validate_email(email, user.id)
             if not valid:
                 return None, error
             ok, err = self.is_email_unique(email)

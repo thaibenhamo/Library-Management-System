@@ -38,9 +38,6 @@ class Loan(db.Model):
         """
         Convert Loan object to JSON-serializable dictionary.
 
-        Args:
-            None
-
         Returns:
             dict: Dictionary containing loan id, user_id, book_copy_id, dates in ISO format, and return status.
         """

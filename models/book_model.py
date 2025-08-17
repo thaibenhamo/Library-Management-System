@@ -30,9 +30,6 @@ class Book(db.Model):
         """
         Convert Book object to JSON-serializable dictionary.
 
-        Args:
-            None
-
         Returns:
             dict: Dictionary containing book id, title, author_id, and category_id.
         """

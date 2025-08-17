@@ -1,7 +1,3 @@
-"""
-Service to fetch and populate books into the database using Google Books API.
-Automatically handles creation of authors, categories, and books if they do not already exist.
-"""
 
 import requests
 from models.book_model import Book
@@ -14,7 +10,19 @@ from extensions import db
 
 
 class FillBooksService:
+    """
+    Service to fetch books from Google Books API and populate database.
+
+    Attributes:
+        author_repo (AuthorRepository): Repository for author persistence.
+        category_repo (CategoryRepository): Repository for category persistence.
+        book_repo (BookRepository): Repository for book persistence.
+    """
+
     def __init__(self):
+        """
+        Initialize with repository instances.
+        """
         self.author_repo = AuthorRepository()
         self.category_repo = CategoryRepository()
         self.book_repo = BookRepository()

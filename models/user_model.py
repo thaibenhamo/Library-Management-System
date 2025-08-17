@@ -39,9 +39,6 @@ class User(db.Model):
         """
         Convert User object to dictionary format excluding sensitive data.
 
-        Args:
-            None
-
         Returns:
             dict: Dictionary containing user id, username, email, role, status, and creation timestamp.
         """

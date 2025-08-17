@@ -22,9 +22,6 @@ class Author(db.Model):
         """
         Serialize Author instance to dictionary format.
 
-        Args:
-            None
-
         Returns:
             dict: Author data as dictionary with 'id' and 'name' keys.
         """

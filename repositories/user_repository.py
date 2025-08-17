@@ -24,9 +24,6 @@ class UserRepository:
 
         Args:
             db_session (Session, optional): Custom database session, defaults to db.session.
-
-        Returns:
-            None
         """
         self.db_session = db_session or db.session
     
@@ -89,9 +86,6 @@ class UserRepository:
     def find_all(self):
         """
         Retrieve all users from the database using SQLAlchemy select statement.
-
-        Args:
-            None
 
         Returns:
             list[User]: List of all User instances.
