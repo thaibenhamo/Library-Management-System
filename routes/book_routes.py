@@ -38,7 +38,7 @@ def add_book():
 
         required_fields = ['title', 'author_id', 'category_id']
         for field in required_fields:
-            if field not in data:
+            if field not in data or not data[field]:
                 return jsonify({'error': f'Missing required field: {field}'}), 400
 
         book, error = book_service.create_book(

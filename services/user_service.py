@@ -25,13 +25,14 @@ class UserService:
         Returns:
             tuple[User | None, str | None]: Created user object or error message.
         """
-        username_re = r"^[A-Za-z0-9]{6,16}$"
+        username_re = r"^[A-Za-z][a-zA-Z0-9_]{2,15}$"
         email_re = r"^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$"
         password_re = r"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,32}$"
 
         if not re.fullmatch(username_re, username):
-            return None, "Invalid username format (6–16 alphanumerics)."
-        if email and not re.fullmatch(email_re, email):
+            return None, ("Username must start with a letter, can contain letters, numbers and underscores "
+                          "(3–16  characters).")
+        if not re.fullmatch(email_re, email):
             return None, "Invalid email format."
         if not re.fullmatch(password_re, password):
             return None, ("Password must be 8–32 chars with at least one lowercase, "

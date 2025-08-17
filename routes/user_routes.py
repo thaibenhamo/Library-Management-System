@@ -9,17 +9,19 @@ user_service = UserService()
 @user_bp.route('', methods=['POST'])
 def add_user():
     data = request.get_json()
+
     if not data:
         return jsonify({'error': 'No JSON data provided'}), 400
-    if not data.get('username'):
-        return jsonify({'error': 'Username is required'}), 400
-    if not data.get('password'):
-        return jsonify({'error': 'Password is required'}), 400
+
+    required_fields = ['username', 'password', 'email']
+    for field in required_fields:
+        if field not in data or not data[field]:
+            return jsonify({'error': f'Missing required field: {field}'}), 400
 
     user, error = user_service.create_user(
         username=data['username'],
         password=data['password'],
-        email=data.get('email')
+        email=data['email']
     )
     if error:
         return jsonify({'error': error}), 400
