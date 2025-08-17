@@ -1,5 +1,6 @@
 from flask import Blueprint, request, jsonify
 from services.user_service import UserService
+from flask_jwt_extended import create_access_token
 
 user_bp = Blueprint('user_bp', __name__)
 user_service = UserService()
@@ -8,17 +9,19 @@ user_service = UserService()
 @user_bp.route('', methods=['POST'])
 def add_user():
     data = request.get_json()
+
     if not data:
         return jsonify({'error': 'No JSON data provided'}), 400
-    if not data.get('username'):
-        return jsonify({'error': 'Username is required'}), 400
-    if not data.get('password'):
-        return jsonify({'error': 'Password is required'}), 400
+
+    required_fields = ['username', 'password', 'email']
+    for field in required_fields:
+        if field not in data or not data[field]:
+            return jsonify({'error': f'Missing required field: {field}'}), 400
 
     user, error = user_service.create_user(
         username=data['username'],
         password=data['password'],
-        email=data.get('email')
+        email=data['email']
     )
     if error:
         return jsonify({'error': error}), 400
@@ -64,5 +67,17 @@ def delete_user(user_id):
     success, message = user_service.delete_user(user_id)
     if not success:
         return jsonify({'message': message}), 404
-    # 204 must not include a body
+
     return '', 204
+
+@user_bp.route('/<int:user_id>', methods=['PUT'])
+def update_user(user_id):
+    data = request.get_json()
+    if not data:
+        return jsonify({'error': 'No input data provided'}), 400
+
+    updated_user, error = user_service.update_user(user_id, data)
+    if error:
+        return jsonify({'error': error}), 400
+
+    return jsonify(updated_user.json()), 200

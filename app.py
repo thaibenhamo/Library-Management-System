@@ -1,8 +1,9 @@
-from datetime import timedelta
-
 from flask import Flask, jsonify
-from config.database import init_db
-from extensions import jwt, limiter, cache
+
+from config import Config
+from app_config.database import init_db
+from extensions import jwt
+
 from routes.auth_routes import auth_bp
 from routes.health_routes import health_bp
 from routes.user_routes import user_bp
@@ -11,22 +12,15 @@ from routes.book_routes import book_bp
 from routes.category_routes import category_bp
 from routes.book_copy_routes import book_copy_bp
 from routes.loan_routes import loan_bp
+from routes.export_routes import export_bp
 
 
 def create_app():
     app = Flask(__name__)
-
-    # temporary secret; we’ll move this to env later
-    app.config["JWT_SECRET_KEY"] = "change-me"  # will move to env later
-    app.config["JWT_TOKEN_LOCATION"] = ["headers"]
-    app.config["JWT_HEADER_NAME"] = "Authorization"
-    app.config["JWT_HEADER_TYPE"] = "Bearer"
-    app.config['JWT_ACCESS_TOKEN_EXPIRES'] = timedelta(hours=2)
+    app.config.from_object(Config)
 
     init_db(app)
     jwt.init_app(app)
-    limiter.init_app(app)
-    cache.init_app(app)
 
     @app.errorhandler(Exception)
     def handle_error(err):
@@ -41,6 +35,7 @@ def create_app():
     app.register_blueprint(category_bp, url_prefix='/api/categories')
     app.register_blueprint(book_copy_bp, url_prefix="/api/book_copies")
     app.register_blueprint(loan_bp, url_prefix="/api/loans")
+    app.register_blueprint(export_bp, url_prefix="/api/export")
 
     return app
 

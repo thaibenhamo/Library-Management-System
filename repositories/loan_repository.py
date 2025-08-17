@@ -33,3 +33,24 @@ class LoanRepository:
         except Exception as e:
             print(f"Error fetching active loans: {e}")
             return []
+
+    def get_by_id(self, loan_id):
+        return self.db_session.get(Loan, loan_id)
+
+    def update(self, loan):
+        try:
+            self.db_session.commit()
+            return True
+        except Exception as e:
+            self.db_session.rollback()
+            print(f"Error updating loan: {e}")
+            return False
+
+    def get_by_user_id(self, user_id):
+        return self.db_session.query(Loan).filter_by(user_id=user_id).all()
+
+    def count_all_loans(self):
+        return self.db_session.query(Loan).count()
+
+    def count_loans_by_return_status(self, returned=True):
+        return self.db_session.query(Loan).filter_by(is_returned=returned).count()
