@@ -1,6 +1,5 @@
 from flask import Blueprint, request, jsonify
 from services.user_service import UserService
-from flask_jwt_extended import create_access_token
 
 user_bp = Blueprint('user_bp', __name__)
 user_service = UserService()
@@ -70,6 +69,7 @@ def delete_user(user_id):
 
     return '', 204
 
+
 @user_bp.route('/<int:user_id>', methods=['PUT'])
 def update_user(user_id):
     data = request.get_json()
@@ -78,6 +78,11 @@ def update_user(user_id):
 
     updated_user, error = user_service.update_user(user_id, data)
     if error:
+        if error == "User not found":
+            return jsonify({'error': error}), 404
         return jsonify({'error': error}), 400
 
-    return jsonify(updated_user.json()), 200
+    return jsonify({
+        'message': 'Book updated successfully',
+        'user': updated_user.to_dict()
+    }), 200

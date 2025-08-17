@@ -28,13 +28,13 @@ class Book(db.Model):
 
     def json(self):
         """
-            Convert Book object to JSON-serializable dictionary.
+        Convert Book object to JSON-serializable dictionary.
 
-            Args:
-                None
+        Args:
+            None
 
-            Returns:
-                dict: Dictionary containing book id, title, author_id, and category_id.
+        Returns:
+            dict: Dictionary containing book id, title, author_id, and category_id.
         """
         return {
             'id': self.id,

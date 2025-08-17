@@ -63,7 +63,7 @@ class FillBooksService:
 
             # Create and save new book
             book = Book(title=title, author_id=author.id, category_id=category.id)
-            self.book_repo.save_for_api(book)
+            self.book_repo.save(book)
             created.append(title)
 
         db.session.commit()
