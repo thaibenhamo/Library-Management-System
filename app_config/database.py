@@ -1,8 +1,16 @@
-
 from extensions import db, bcrypt
 
 
 def init_db(app):
+    """
+       Initialize database and hashing extensions for the Flask app, and create all tables.
+
+       Args:
+           app (Flask): Flask application instance.
+
+       Returns:
+           None
+       """
     db.init_app(app)
     bcrypt.init_app(app)
 
