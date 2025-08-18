@@ -36,11 +36,10 @@ A Flask-based Library Management System that supports book inventory, user manag
 
 - **Backend Framework**: Flask  
 - **ORM**: SQLAlchemy  
-- **Database**: SQLite (can be upgraded to PostgreSQL/MySQL)  
+- **Database**: PostgreSQL   
 - **Authentication**: Manual session management  
 - **API Consumption**: Google Books API  
-- **Security**: Werkzeug (password hashing)  
-- **Documentation Style**: PEP-8 + inline docstrings  
+- **Security**: bcrypt (password hashing)  
 
 ---
 
@@ -84,7 +83,9 @@ A Flask-based Library Management System that supports book inventory, user manag
 │   ├── user_service.py
 │   └── fill_books_service.py
 ├── utils/
-│   └── password_utils.py           # Password hashing utilities
+│   ├── password_utils.py           # Password hashing utilities
+│   ├── export_utils.py 
+│   └── authz.py
 ├── extensions.py                   # Flask extension bindings
 ├── app.py                          # Entry point of the application
 ├── requirements.txt                # Project dependencies
@@ -126,31 +127,159 @@ A Flask-based Library Management System that supports book inventory, user manag
 
 ---
 
-## 🔗 API Endpoints (Summary)
+# 📖 Library Management System – API Documentation
 
-> These are just a few — full API documentation recommended using Swagger/Postman.
-
-### User
-- `POST /users/register`
-- `POST /users/login`
-- `GET /users/<id>`
-
-### Category
-- `GET /categories`
-- `POST /categories/add`
-- `PUT /categories/update/<id>`
-- `DELETE /categories/delete/<id>`
-
-### Book Import
-- `POST /books/fetch` — Uses Google Books API to insert books by query
-
-### Loans
-- `POST /loans/create`
-- `POST /loans/return/<loan_id>`
-- `GET /loans/user/<user_id>`
-- `GET /loans/stats`
+Base URL: `http://127.0.0.1:5000/api`
 
 ---
+
+## 🩺 Health
+- **GET `/health`**  
+  Returns service health.  
+  **Response:**  
+  ```json
+  { "status": "ok" }
+  ```
+
+---
+
+## 🔐 Auth
+- **POST `/auth/login`**  
+  ```json
+  { "username": "john123", "password": "Password@123" }
+  ```
+  **Response:**  
+  ```json
+  {
+    "access_token": "<JWT>",
+    "user": { "id": 1, "username": "john123", "email": "john@example.com" }
+  }
+  ```
+
+- **POST `/auth/logout`**  
+  **Response:**  
+  ```json
+  { "message": "Logged out successfully", "success": true }
+  ```
+
+---
+
+## 👤 Users
+- **POST `/users`** – create user  
+  ```json
+  { "username": "john123", "password": "Password@123", "email": "john@example.com" }
+  ```
+
+- **GET `/users`** – list all users  
+- **GET `/users/<id>`** – get user by id  
+- **GET `/users/username/<username>`** – get user by username  
+- **GET `/users/email/<email>`** – get user by email  
+
+- **PUT `/users/<id>`** – update user  
+  ```json
+  { "email": "new@example.com", "password": "NewPass@123" }
+  ```
+
+- **DELETE `/users/<id>`** – delete user  
+
+---
+
+## ✍ Authors
+- **POST `/authors`** – create author  
+  ```json
+  { "name": "Isaac Asimov" }
+  ```
+
+- **GET `/authors`** – list all authors  
+- **GET `/authors/<id>`** – get author by id  
+
+- **PUT `/authors/<id>`** – update author  
+  ```json
+  { "name": "Arthur C. Clarke" }
+  ```
+
+- **DELETE `/authors/<id>`** – delete author  
+
+---
+
+## 📚 Categories
+- **POST `/categories`** – create category  
+  ```json
+  { "name": "Science Fiction" }
+  ```
+
+- **GET `/categories`** – list all categories  
+- **GET `/categories/<id>`** – get category by id  
+
+- **PUT `/categories/<id>`** – update category  
+  ```json
+  { "name": "Sci-Fi" }
+  ```
+
+- **DELETE `/categories/<id>`** – delete category  
+
+---
+
+## 📖 Books
+- **GET `/books`** – list all books  
+
+- **POST `/books`** – create book  
+  ```json
+  { "title": "Dune", "author_id": 3, "category_id": 1 }
+  ```
+
+- **GET `/books/<id>`** – get book by id  
+
+- **PUT `/books/<id>`** – update book  
+  ```json
+  { "title": "Dune (Revised)" }
+  ```
+
+- **DELETE `/books/<id>`** – delete book  
+
+- **POST `/books/fill_external`** – import via Google Books  
+  ```json
+  { "query": "science fiction", "limit": 10 }
+  ```
+
+- **GET `/books/by-title/<title>`** – find book by title  
+
+---
+
+## 📕 Book Copies
+- **GET `/book_copies`** – list all book copies  
+
+- **POST `/book_copies`** – create book copy  
+
+- **GET `/book_copies/<id>`** – get book copy  
+
+- **PUT `/book_copies/<id>`** – update book copy  
+
+- **DELETE `/book_copies/<id>`** – delete book copy  
+
+- **GET `/book_copies/availability`** – list available copies (counts per book)  
+
+---
+
+## 📑 Loans
+- **GET `/loans`** – list all loans  
+
+- **POST `/loans`** – create loan
+- **PUT `/loans/<loan_id>/return`** – return a loan  
+- **GET `/loans/<loan_id>`** – get loan  
+- **GET `/loans/user/<user_id>`** – get user’s loan history  
+- **GET `/loans/stats`** – loan statistics  
+
+---
+
+## 📤 Export (Excel)
+- **GET `/export/books.xlsx`**  
+- **GET `/export/authors.xlsx`**  
+- **GET `/export/categories.xlsx`**  
+- **GET `/export/book_copies.xlsx`**  
+- **GET `/export/loans.xlsx`**  
+- **GET `/export/users.xlsx`**  
+- **GET `/export/all.xlsx`** – all entities in one workbook
 
 ## 🗃️ Database Schema
 
