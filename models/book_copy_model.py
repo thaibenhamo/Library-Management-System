@@ -3,22 +3,22 @@ from extensions import db
 
 class BookCopy(db.Model):
     """
-        BookCopy model representing individual physical copies of books.
+    BookCopy model representing individual physical copies of books.
 
-        Args:
-            book_id (int): Foreign key reference to the book.
-            location (str): Physical shelf location of the copy.
-            available (bool, optional): Availability status, defaults to True.
+    Args:
+        book_id (int): Foreign key reference to the book.
+        location (str): Physical shelf location of the copy.
+        available (bool, optional): Availability status, defaults to True.
 
-        Attributes:
-            id (int): Auto-generated primary key.
-            book_id (int): Reference to the associated book.
-            available (bool): Whether the copy is available for checkout.
-            location (str): Physical location/shelf identifier, max 100 characters.
+    Attributes:
+        id (int): Auto-generated primary key.
+        book_id (int): Reference to the associated book.
+        available (bool): Whether the copy is available for checkout.
+        location (str): Physical location/shelf identifier, max 100 characters.
 
-        Returns:
-            BookCopy: BookCopy model instance.
-        """
+    Returns:
+        BookCopy: BookCopy model instance.
+    """
     __tablename__ = 'book_copy'
 
     id = db.Column(db.Integer, primary_key=True)
@@ -28,13 +28,10 @@ class BookCopy(db.Model):
 
     def json(self):
         """
-            Convert BookCopy object to JSON-serializable dictionary.
+        Convert BookCopy object to JSON-serializable dictionary.
 
-            Args:
-                None
-
-            Returns:
-                dict: Dictionary containing book copy id, book_id, availability status, and location.
+        Returns:
+            dict: Dictionary containing book copy id, book_id, availability status, and location.
         """
         return {
             'id': self.id,

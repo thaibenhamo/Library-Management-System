@@ -4,26 +4,26 @@ from sqlalchemy import func
 
 class User(db.Model):
     """
-        User model for managing user accounts and authentication.
+    User model for managing user accounts and authentication.
 
-        Args:
-            username (str): Unique username, max 80 characters.
-            email (str): Unique email address, max 120 characters.
-            password (str): Hashed password, max 255 characters.
-            role (str, optional): User role, defaults to "member".
-            is_active (bool, optional): Account status, defaults to True.
+    Args:
+        username (str): Unique username, max 80 characters.
+        email (str): Unique email address, max 120 characters.
+        password (str): Hashed password, max 255 characters.
+        role (str, optional): User role, defaults to "member".
+        is_active (bool, optional): Account status, defaults to True.
 
-        Attributes:
-            id (int): Auto-generated primary key.
-            username (str): Unique username, max 80 characters, required.
-            email (str): Unique email address, max 120 characters, required.
-            password (str): Hashed password string, max 255 characters, required.
-            role (str): User role (admin|librarian|member), defaults to "member".
-            is_active (bool): Account active status, defaults to True.
-            created_at (datetime): Account creation timestamp, auto-generated.
+    Attributes:
+        id (int): Auto-generated primary key.
+        username (str): Unique username, max 80 characters, required.
+        email (str): Unique email address, max 120 characters, required.
+        password (str): Hashed password string, max 255 characters, required.
+        role (str): User role (admin|librarian|member), defaults to "member".
+        is_active (bool): Account active status, defaults to True.
+        created_at (datetime): Account creation timestamp, auto-generated.
 
-        Returns:
-            User: User model instance.
+    Returns:
+        User: User model instance.
     """
     __tablename__ = "user"
 
@@ -37,13 +37,10 @@ class User(db.Model):
 
     def to_dict(self):
         """
-            Convert User object to dictionary format excluding sensitive data.
+        Convert User object to dictionary format excluding sensitive data.
 
-            Args:
-                None
-
-            Returns:
-                dict: Dictionary containing user id, username, email, role, status, and creation timestamp.
+        Returns:
+            dict: Dictionary containing user id, username, email, role, status, and creation timestamp.
         """
         return {
             "id": self.id,

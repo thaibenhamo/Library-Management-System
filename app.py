@@ -1,4 +1,5 @@
 from flask import Flask, jsonify
+from werkzeug.exceptions import HTTPException, BadRequest
 
 from config import Config
 from app_config.database import init_db
@@ -16,6 +17,15 @@ from routes.export_routes import export_bp
 
 
 def create_app():
+    """
+    Application factory function to create and configure Flask app.
+
+    Sets up database, JWT authentication, error handling, and registers
+    all API blueprints with their respective URL prefixes.
+
+    Returns:
+        Flask: Configured Flask application instance ready to run.
+    """
     app = Flask(__name__)
     app.config.from_object(Config)
 
@@ -24,8 +34,33 @@ def create_app():
 
     @app.errorhandler(Exception)
     def handle_error(err):
-        code = getattr(err, "code", 500)
-        return jsonify({"error": type(err).__name__, "message": str(err)}), code
+        """
+        Global error handler for all exceptions.
+
+        Provides consistent JSON error responses across the application.
+        Distinguishes between HTTP errors and unexpected server errors.
+
+        Args:
+            err (Exception): The caught exception.
+
+        Returns:
+            tuple: JSON response and HTTP status code.
+                  Format: {"error": "ErrorType", "message": "description"}
+        """
+        if isinstance(err, HTTPException):
+            code = err.code
+            if isinstance(err, BadRequest):
+                message = "Invalid request payload"  # safer message
+            else:
+                message = err.description
+        else:
+            code = 500
+            message = "An unexpected error occurred"
+
+        return jsonify({
+            "error": type(err).__name__,
+            "message": message
+        }), code
 
     app.register_blueprint(health_bp, url_prefix="/api")
     app.register_blueprint(user_bp, url_prefix="/api/users")
@@ -41,6 +76,11 @@ def create_app():
 
 
 if __name__ == '__main__':
-    
+    """
+    Entry point for running the application directly.
+
+    Creates the Flask app using the factory pattern and starts
+    the development server with debug mode enabled.
+    """
     app = create_app()
     app.run(debug=True)

@@ -1,7 +1,3 @@
-"""
-Defines routes for exporting library data as Excel (.xlsx) files.
-Each route returns a downloadable spreadsheet of a specific entity.
-"""
 
 from flask import Blueprint, send_file
 from extensions import db
@@ -15,8 +11,18 @@ from utils.export_utils import rows_to_dataframe, make_xlsx_bytes
 
 export_bp = Blueprint("export_bp", __name__, url_prefix="/api/export")
 
+
 def _as_xlsx_response(sheets: dict[str, "pd.DataFrame"], filename: str):
-    """Helper to generate a downloadable Excel response from sheet(s)."""
+    """
+    Generate a downloadable Excel (.xlsx) response from given sheet(s).
+
+    Args:
+        sheets (dict): Sheet name -> DataFrame.
+        filename (str): Filename for download.
+
+    Returns:
+        Flask Response: Excel file download.
+    """
     xlsx_io = make_xlsx_bytes(sheets)
     return send_file(
         xlsx_io,
@@ -26,45 +32,93 @@ def _as_xlsx_response(sheets: dict[str, "pd.DataFrame"], filename: str):
         max_age=0,
     )
 
+
 @export_bp.route("/books.xlsx", methods=["GET"])
 def export_books():
-    """Export all books as an Excel file."""
+    """
+    Export all books as an Excel file.
+
+    Returns:
+        200: Downloadable Excel (.xlsx) file of books.
+    """
     rows = db.session.query(Book).all()
     return _as_xlsx_response({"books": rows_to_dataframe(rows)}, "books.xlsx")
 
+
 @export_bp.route("/authors.xlsx", methods=["GET"])
 def export_authors():
-    """Export all authors as an Excel file."""
+    """
+    Export all authors as an Excel file.
+
+    Returns:
+        200: Downloadable Excel (.xlsx) file of authors.
+    """
     rows = db.session.query(Author).all()
-    return _as_xlsx_response({"authors": rows_to_dataframe(rows)}, "authors.xlsx")
+    return _as_xlsx_response({
+        "authors": rows_to_dataframe(rows)
+    }, "authors.xlsx")
+
 
 @export_bp.route("/categories.xlsx", methods=["GET"])
 def export_categories():
-    """Export all categories as an Excel file."""
+    """
+    Export all categories as an Excel file.
+
+    Returns:
+        200: Downloadable Excel (.xlsx) file of categories.
+    """
     rows = db.session.query(Category).all()
-    return _as_xlsx_response({"categories": rows_to_dataframe(rows)}, "categories.xlsx")
+    return _as_xlsx_response({
+        "categories": rows_to_dataframe(rows)},
+        "categories.xlsx")
 
 @export_bp.route("/book_copies.xlsx", methods=["GET"])
 def export_book_copies():
-    """Export all book copies as an Excel file."""
+    """
+    Export all book copies as an Excel file.
+
+    Returns:
+        200: Downloadable Excel (.xlsx) file of book copies.
+    """
     rows = db.session.query(BookCopy).all()
-    return _as_xlsx_response({"book_copies": rows_to_dataframe(rows)}, "book_copies.xlsx")
+    return _as_xlsx_response({
+        "book_copies": rows_to_dataframe(rows)
+    }, "book_copies.xlsx")
+
 
 @export_bp.route("/loans.xlsx", methods=["GET"])
 def export_loans():
-    """Export all loans as an Excel file."""
+    """
+    Export all loans as an Excel file.
+
+    Returns:
+        200: Downloadable Excel (.xlsx) file of loans.
+    """
     rows = db.session.query(Loan).all()
     return _as_xlsx_response({"loans": rows_to_dataframe(rows)}, "loans.xlsx")
 
+
 @export_bp.route("/users.xlsx", methods=["GET"])
 def export_users():
-    """Export all users as an Excel file."""
+    """
+    Export all users as an Excel file.
+
+    Returns:
+        200: Downloadable Excel (.xlsx) file of users.
+    """
     rows = db.session.query(User).all()
     return _as_xlsx_response({"users": rows_to_dataframe(rows)}, "users.xlsx")
 
+
 @export_bp.route("/all.xlsx", methods=["GET"])
 def export_all():
-    """Export all entities (books, authors, etc.) into one Excel file with multiple sheets."""
+    """
+    Export all entities (books, authors, categories, book copies, loans, users)
+    into one Excel file with multiple sheets.
+
+    Returns:
+        200: Downloadable Excel (.xlsx) file with all sheets.
+    """
     sheets = {
         "books":       rows_to_dataframe(db.session.query(Book).all()),
         "authors":     rows_to_dataframe(db.session.query(Author).all()),
