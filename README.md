@@ -46,9 +46,8 @@ A Flask-based Library Management System that supports book inventory, user manag
 ## 🗂️ Project Structure
 
 ```
-├── config/                          # Configuration files
-├── instance/
-│   └── app.db                       # SQLite database file
+├── app_config/                      # Configuration files
+│   └── database.py
 ├── models/                          # SQLAlchemy models
 │   ├── Author_model.py
 │   ├── book_model.py
@@ -88,6 +87,7 @@ A Flask-based Library Management System that supports book inventory, user manag
 │   └── authz.py
 ├── extensions.py                   # Flask extension bindings
 ├── app.py                          # Entry point of the application
+├── config.py     
 ├── requirements.txt                # Project dependencies
 └── README.md                       # Project documentation
 ```
@@ -99,13 +99,14 @@ A Flask-based Library Management System that supports book inventory, user manag
 
 ### Prerequisites
 - Python 3.8+
+- PostgreSQL
 - Flask & dependencies from `requirements.txt`
 
 ### Setup
 
 1. Clone the repo:
    ```bash
-   git clone <your-repo-url>
+   git clone <https://github.com/thaibenhamo/Library-Management-System.git>
    cd Library-Management-System
    ```
 
@@ -120,6 +121,27 @@ A Flask-based Library Management System that supports book inventory, user manag
    pip install -r requirements.txt
    ```
 
+4. Create a `.env` file in the root directory:
+
+   ```bash
+   touch .env
+   ```
+
+5. Copy the following template into `.env` and adjust values if necessary:
+
+   ```env
+   DB_USER=<your_db_username>
+   DB_PASSWORD=<your_db_password>
+   DB_HOST=<your_db_host>
+   DB_PORT=<your_db_port>
+   DB_NAME=<your_db_name>
+
+   DB_URL=postgresql://${DB_USER}:${DB_PASSWORD}@${DB_HOST}:${DB_PORT}/${DB_NAME}
+
+  JWT_SECRET_KEY=<your_secret_key>
+  JWT_ACCESS_TOKEN_EXPIRES_HOURS=<hours_until_expiration>
+  ```
+
 4. Run the app:
    ```bash
    flask run
@@ -129,7 +151,7 @@ A Flask-based Library Management System that supports book inventory, user manag
 
 # 📖 Library Management System – API Documentation
 
-Base URL: `http://127.0.0.1:5000/api`
+Base URL: `http://localhost:5000/api`
 
 ---
 
@@ -142,26 +164,31 @@ Base URL: `http://127.0.0.1:5000/api`
   ```
 
 ---
-
 ## 🔐 Auth
-- **POST `/auth/login`**  
-  ```json
-  { "username": "john123", "password": "Password@123" }
-  ```
-  **Response:**  
-  ```json
-  {
-    "access_token": "<JWT>",
-    "user": { "id": 1, "username": "john123", "email": "john@example.com" }
-  }
-  ```
+**POST** /auth/login **
+```json
+{ "username": "john123", "password": "Password@123" }
+```
 
-- **POST `/auth/logout`**  
-  **Response:**  
-  ```json
-  { "message": "Logged out successfully", "success": true }
-  ```
+**Response:**
+```json
+{
+  "access_token": "<JWT_ACCESS_TOKEN>",
+  "user": { "id": 1, "username": "john123", "email": "john@example.com" }
+}
+```
 
+💡  
+**POST** /auth/logout **  
+**Headers:**
+```
+Authorization: Bearer <JWT_ACCESS_TOKEN>
+```
+
+**Response:**
+```json
+{ "message": "Logged out successfully", "success": true }
+```
 ---
 
 ## 👤 Users
@@ -305,17 +332,20 @@ Base URL: `http://127.0.0.1:5000/api`
 
 ## 🔐 Authentication
 
-- Manual session-style login (no JWT)
-- Passwords are hashed using Werkzeug
-- Validation using `re` (regex) in service layer
+* Basic authentication logic implemented in `AuthService` (username + password check).
+* Passwords are hashed and verified using **Flask-Bcrypt** (bcrypt algorithm).
+* Validation of input (e.g., username, password format) is handled in the **service layer**.
+* ⚠️ Currently **no routes enforce authentication** (all endpoints are publicly accessible).
 
 ---
 
 ## 📈 Future Improvements
 
-- JWT-based session authentication  
-- Admin role management for category/book access control  
-- Swagger/OpenAPI docs  
-- Pagination & filtering  
-- Testing suite using Pytest
+* Enforce authentication on protected routes (e.g., borrowing books).
+* Add **JWT-based session authentication** for stateless APIs.
+* Introduce **role-based authorization** (e.g., only librarians/admins can add/remove books).
+* Swagger/OpenAPI docs.
+* Pagination & filtering.
+* Testing suite using Pytest.
 
+---
